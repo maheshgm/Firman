@@ -1,0 +1,59 @@
+name: Nightly CI
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/nightly-ci.yml"
+  workflow_dispatch:
+
+jobs:
+  ci:
+    uses: angr/ci-settings/.github/workflows/angr-ci.yml@master
+    with:
+      nightly: true
+    secrets: inherit
+  windows:
+    name: Test Windows
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        runner_id: [1, 2, 3, 4, 5]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          path: angr
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: angr/binaries
+          path: binaries
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
+      - uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6
+      - name: Sync dependencies
+        run: uv --directory angr sync -p 3.10
+      - name: Run pytest
+        run: uv --directory angr run pytest -n auto --splits 5 --group ${{ matrix.runner_id }} tests
+  macos:
+    name: Test macOS
+    runs-on: macos-13
+    strategy:
+      matrix:
+        runner_id: [1, 2, 3]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          path: angr
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          repository: angr/binaries
+          path: binaries
+      - uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6
+      - name: Sync dependencies
+        run: uv --directory angr sync -p 3.10
+      - name: Run pytest
+        run: uv --directory angr run pytest -n auto --splits 3 --group ${{ matrix.runner_id }} tests

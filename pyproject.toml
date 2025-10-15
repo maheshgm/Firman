@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "firman"
+version = "0.1.0"
+description = "Firmware Analyzer"
+authors = ["mahesh <gmahesh9391@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+
+python = "^3.12"
+pyelftools = "^0.32"
+setuptools-rust = "^1.11.1"
+
+[build-system]
+requires = ["poetry-core", "setuptools-rust"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+firman = "firman.firman:main"

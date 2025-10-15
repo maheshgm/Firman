@@ -1,0 +1,57 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+from angr.ailment import Block
+from angr.ailment.statement import Label, ConditionalJump
+from angr.ailment.block_walker import AILBlockWalkerBase
+
+from angr.analyses.decompiler.sequence_walker import SequenceWalker
+
+if TYPE_CHECKING:
+    from angr.ailment.statement import Call
+
+
+class AILBlockCallCounter(AILBlockWalkerBase):
+    """
+    Helper class to count AIL calls and call-expressions in a block
+    """
+
+    calls = 0
+
+    def _handle_ConditionalJump(self, stmt_idx: int, stmt: ConditionalJump, block: Block | None):
+        return
+
+    def _handle_CallExpr(self, expr_idx: int, expr: Call, stmt_idx: int, stmt, block: Block | None):
+        self.calls += 1
+        super()._handle_CallExpr(expr_idx, expr, stmt_idx, stmt, block)
+
+    def _handle_Call(self, stmt_idx: int, stmt: Call, block: Block | None):
+        self.calls += 1
+        super()._handle_Call(stmt_idx, stmt, block)
+
+
+class AILCallCounter(SequenceWalker):
+    """
+    Helper class to count AIL calls and call expressions in a structuring node.
+    """
+
+    def __init__(self):
+        handlers = {
+            Block: self._handle_Block,
+        }
+        super().__init__(handlers)
+        self.calls = 0
+        self.non_label_stmts = 0
+
+    def _handle_Condition(self, node, **kwargs):
+        # do not count calls in conditions
+        if node.true_node is not None:
+            super()._handle(node.true_node, **kwargs)
+        if node.false_node is not None:
+            super()._handle(node.false_node, **kwargs)
+
+    def _handle_Block(self, node: Block, **kwargs):  # pylint:disable=unused-argument
+        ctr = AILBlockCallCounter()
+        ctr.walk(node)
+        self.calls += ctr.calls
+        self.non_label_stmts += sum(1 for stmt in node.statements if not isinstance(stmt, Label))

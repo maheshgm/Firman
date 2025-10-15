@@ -1,0 +1,33 @@
+{
+    "bb_limit_intr": 2000,
+    "bb_limit_systick": 5000,
+    "base_dir": "./",
+    "base_addr": "0x08000000",
+    "entry": "0x99d",
+    "rules_file": "./Gateway.info",
+    "grammar_file": "./grammar.json",
+    "unique_name": "Gateway",
+    "code_low":  "0x08000000",
+    "code_high": "0x1fffffff",
+    "int_list": [6, 7, 8, 9, 10, 23, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41],
+    "exits": ["0x080036a4", "0x0800742c", "0x080088ac"]
+}
+
+{
+    bb_limit_intr
+    bb_limit_systick
+    uniq_name
+    code_low
+    code_high
+    "name": "/home/mahesh/ssd/fuzzware/examples/P2IM/Gateway/Gateway.elf",
+    "base_dir": "/home/mahesh/ssd/fuzzware/examples/P2IM/Gateway",
+    "base_addr": "0x8000000",
+    "entry": "0x800365d",
+    "rules_file": "/home/mahesh/ssd/fuzzware/examples/P2IM/Gateway/Gateway.info",
+    "grammar_file": "/home/mahesh/ssd/fuzzware/examples/P2IM/Gateway/Gateway.json",
+    "unique_name": "Gateway",
+    "int_list": [
+
+    ]
+    exits
+}
